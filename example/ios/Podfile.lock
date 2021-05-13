@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - i_textfield (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - i_textfield (from `.symlinks/plugins/i_textfield/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  i_textfield:
+    :path: ".symlinks/plugins/i_textfield/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  i_textfield: a23ccd4bc6072495a9792ff4dba3512816620ead
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.10.1
