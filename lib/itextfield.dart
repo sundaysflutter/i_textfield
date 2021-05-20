@@ -18,9 +18,12 @@ enum ITextInputType {
 }
 
 class ITextField extends StatefulWidget {
+  final bool enabled;
+  final FocusNode focusNode;
   final ITextInputType keyboardType;
   final int maxLines;
   final int maxLength;
+  final String text;
   final String hintText;
   final TextStyle hintStyle;
   final ITextFieldCallBack fieldCallBack;
@@ -39,9 +42,12 @@ class ITextField extends StatefulWidget {
 
   ITextField(
       {Key key,
+      this.enabled = true,
+      this.focusNode,
       ITextInputType keyboardType: ITextInputType.text,
       this.maxLines = 1,
       this.maxLength,
+      this.text,
       this.hintText,
       this.hintStyle,
       this.fieldCallBack,
@@ -109,10 +115,12 @@ class ITextFieldState extends State<ITextField> {
     return textType;
   }
 
-  TextEditingController mControll3 = TextEditingController();
+  TextEditingController
+      mControll3; // = TextEditingController(text: widget.text ?? '');
   @override
   void initState() {
     super.initState();
+    mControll3 = TextEditingController(text: widget.text ?? '');
   }
 
   ///输入范围
@@ -133,8 +141,13 @@ class ITextFieldState extends State<ITextField> {
   @override
   Widget build(BuildContext context) {
     TextField textField = new TextField(
+      focusNode: widget.focusNode ?? FocusNode(),
+      enabled: widget.enabled,
       controller: mControll3,
+      toolbarOptions:
+          ToolbarOptions(copy: true, cut: true, paste: true, selectAll: true),
       decoration: InputDecoration(
+          labelText: mControll3.text,
           hintStyle: widget.hintStyle,
           counterStyle: TextStyle(color: Colors.white),
           hintText: widget.hintText,
@@ -249,9 +262,12 @@ class ITextFieldState extends State<ITextField> {
 }
 
 class IButtonTextField extends StatefulWidget {
+  final bool enabled;
+  final FocusNode focusNode;
   final ITextInputType keyboardType;
   final int maxLines;
   final int maxLength;
+  final String text;
   final String hintText;
   final TextStyle hintStyle;
   final ITextFieldCallBack fieldCallBack;
@@ -266,9 +282,12 @@ class IButtonTextField extends StatefulWidget {
 
   IButtonTextField(
       {Key key,
+      this.enabled = true,
+      this.focusNode,
       ITextInputType keyboardType: ITextInputType.text,
       this.maxLines = 1,
       this.maxLength,
+      this.text = '',
       this.hintText,
       this.hintStyle,
       this.fieldCallBack,
@@ -331,10 +350,11 @@ class _IButtonTextFieldState extends State<IButtonTextField> {
     return textType;
   }
 
-  TextEditingController mControll3 = TextEditingController();
+  TextEditingController mControll3;
   @override
   void initState() {
     super.initState();
+    mControll3 = TextEditingController(text: widget.text);
   }
 
   ///输入范围
@@ -355,8 +375,13 @@ class _IButtonTextFieldState extends State<IButtonTextField> {
   @override
   Widget build(BuildContext context) {
     TextField textField = new TextField(
+      focusNode: widget.focusNode ?? FocusNode(),
+      enabled: widget.enabled,
       controller: mControll3,
+      toolbarOptions:
+          ToolbarOptions(copy: true, cut: true, paste: true, selectAll: true),
       decoration: InputDecoration(
+        labelText: mControll3.text,
         hintStyle: widget.hintStyle,
         counterStyle: TextStyle(color: Colors.white),
         hintText: widget.hintText,
