@@ -147,7 +147,7 @@ class ITextFieldState extends State<ITextField> {
       toolbarOptions:
           ToolbarOptions(copy: true, cut: true, paste: true, selectAll: true),
       decoration: InputDecoration(
-          labelText: mControll3.text,
+          // labelText: mControll3.text.length > 0 ? mControll3.text : null,
           hintStyle: widget.hintStyle,
           counterStyle: TextStyle(color: Colors.white),
           hintText: widget.hintText,
@@ -162,12 +162,13 @@ class ITextFieldState extends State<ITextField> {
             borderSide: BorderSide(color: Colors.blue),
           )),
       onChanged: (str) {
-        _inputText = str;
-        _hasdeleteIcon = _inputText.isNotEmpty;
-        if (widget.fieldCallBack != null) {
-          widget.fieldCallBack(_inputText);
-        }
-        setState(() {});
+        setState(() {
+          _inputText = str;
+          _hasdeleteIcon = _inputText.isNotEmpty;
+          if (widget.fieldCallBack != null) {
+            widget.fieldCallBack(_inputText);
+          }
+        });
       },
       keyboardType: _getTextInputType(),
       maxLength: widget.maxLength,
@@ -178,7 +179,7 @@ class ITextFieldState extends State<ITextField> {
     );
 
     List<Widget> floorChilden() {
-      List<Widget> arr = [];
+      List<Widget> arr = [Container()];
       if (widget.isOtherFloorDel) {
         if (_hasdeleteIcon) {
           if (widget.otherWidget != null) {
@@ -200,64 +201,75 @@ class ITextFieldState extends State<ITextField> {
     }
 
     return Container(
-        width: double.maxFinite,
         child: Stack(
-          alignment: widget.rightIconsAligment,
-          children: [
-            Align(alignment: Alignment.center, child: textField),
-            Align(
-                // alignment: Alignment(1, 1),
-                child: Container(
-                    child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                _hasdeleteIcon
-                    ? GestureDetector(
-                        child: widget.deleteIcon ?? Container(),
-                        onTap: () {
-                          _inputText = '';
-                          mControll3.clear();
-                        },
-                      )
-                    : Container(),
-                widget.deleteIcon != null
-                    ? SizedBox(
-                        width: widget.rightIconsSpace,
-                      )
-                    : Container(),
-                _hasdeleteIcon
-                    ? GestureDetector(
-                        child: _isPassword == true
-                            ? widget.pwdEyeCloseIcon
-                            : widget.pwdEyeIcon,
-                        onTap: () {
-                          _isPassword = !_isPassword;
+      alignment: widget.rightIconsAligment,
+      children: [
+        Align(alignment: Alignment.center, child: textField),
+        Align(
+            // alignment: widget.rightIconsAligment,
+            child: Container(
+                // color: Colors.red,
+                child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            _hasdeleteIcon
+                ? GestureDetector(
+                    child: widget.deleteIcon ?? Container(),
+                    onTap: () {
+                      _inputText = '';
+                      _hasdeleteIcon = _inputText.isNotEmpty;
+                      mControll3.clear();
+                      setState(() {});
+                    },
+                  )
+                : Container(),
+            widget.deleteIcon != null
+                ? SizedBox(
+                    width: widget.rightIconsSpace,
+                  )
+                : Container(),
+            _hasdeleteIcon &&
+                    widget.pwdEyeCloseIcon != null &&
+                    widget.pwdEyeIcon != null
+                ? GestureDetector(
+                    child: _isPassword == true
+                        ? widget.pwdEyeCloseIcon
+                        : widget.pwdEyeIcon,
+                    onTap: () {
+                      _isPassword = !_isPassword;
 
-                          ITextInputType callType = _isPassword == true
-                              ? ITextInputType.password
-                              : ITextInputType.text;
-                          if (widget.eyeCallBack != null) {
-                            widget.eyeCallBack(callType, _isPassword);
-                          }
-                          setState(() {});
-                        },
-                      )
-                    : Container(),
-                (widget.pwdEyeCloseIcon != null || widget.pwdEyeIcon != null)
-                    ? SizedBox(
-                        width: widget.rightIconsSpace,
-                      )
-                    : Container(),
-                ...floorChilden(),
-                SizedBox(
-                  width: widget.rightIconsSpace,
-                  // height: 50,
-                ),
-              ],
-            )))
+                      ITextInputType callType = (_isPassword == true
+                          ? ITextInputType.password
+                          : ITextInputType.text);
+                      if (widget.eyeCallBack != null) {
+                        widget.eyeCallBack(callType, _isPassword);
+                      }
+                      setState(() {});
+                    },
+                  )
+                : Container(),
+            _hasdeleteIcon &&
+                    widget.pwdEyeCloseIcon != null &&
+                    widget.pwdEyeIcon != null
+                ? SizedBox(
+                    width: widget.rightIconsSpace,
+                  )
+                : Container(),
+            // widget.otherWidget ?? Container(),
+            // SizedBox(
+            //   width: widget.rightIconsSpace,
+            // ),
+
+            ...floorChilden(),
+            SizedBox(
+              width: widget.rightIconsSpace,
+              // height: 50,
+            ),
           ],
-        ));
+        )))
+      ],
+    ));
   }
 }
 
@@ -381,7 +393,7 @@ class _IButtonTextFieldState extends State<IButtonTextField> {
       toolbarOptions:
           ToolbarOptions(copy: true, cut: true, paste: true, selectAll: true),
       decoration: InputDecoration(
-        labelText: mControll3.text,
+        // labelText: mControll3.text.length > 0 ? mControll3.text : null,
         hintStyle: widget.hintStyle,
         counterStyle: TextStyle(color: Colors.white),
         hintText: widget.hintText,
@@ -398,7 +410,7 @@ class _IButtonTextFieldState extends State<IButtonTextField> {
       ),
       onChanged: (str) {
         _inputText = str;
-        _hasdeleteIcon = (_inputText.isNotEmpty);
+        _hasdeleteIcon = _inputText.isNotEmpty;
         if (widget.fieldCallBack != null) {
           widget.fieldCallBack(_inputText);
         }
@@ -420,32 +432,32 @@ class _IButtonTextFieldState extends State<IButtonTextField> {
       child: Stack(alignment: widget.rightIconsAligment, children: <Widget>[
         Align(alignment: Alignment.center, child: textField),
         Align(
-            // alignment: Alignment(1, 1),
+            alignment: widget.rightIconsAligment,
             child: Container(
                 child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            _hasdeleteIcon
-                ? GestureDetector(
-                    child: widget.deleteIcon ?? Container(),
-                    onTap: () {
-                      _inputText = '';
-                      mControll3.clear();
-                    },
-                  )
-                : Container(),
-            widget.deleteIcon != null
-                ? SizedBox(
-                    width: widget.rightIconsSpace,
-                  )
-                : Container(),
-            widget.otherWidget ?? Container(),
-            SizedBox(
-              width: widget.rightIconsSpace,
-            ),
-          ],
-        )))
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                _hasdeleteIcon
+                    ? GestureDetector(
+                        child: widget.deleteIcon ?? Container(),
+                        onTap: () {
+                          _inputText = '';
+                          mControll3.clear();
+                        },
+                      )
+                    : Container(),
+                widget.deleteIcon != null
+                    ? SizedBox(
+                        width: widget.rightIconsSpace,
+                      )
+                    : Container(),
+                widget.otherWidget ?? Container(),
+                SizedBox(
+                  width: widget.rightIconsSpace,
+                ),
+              ],
+            )))
       ]),
     );
   }
