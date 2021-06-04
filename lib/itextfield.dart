@@ -21,6 +21,7 @@ class ITextField extends StatefulWidget {
   final bool enabled;
   final FocusNode focusNode;
   final ITextInputType keyboardType;
+  final TextInputAction textInputAction;
   final int maxLines;
   final int maxLength;
   final String text;
@@ -39,12 +40,14 @@ class ITextField extends StatefulWidget {
   final Widget prefixIcon;
   final TextStyle textStyle;
   final FormFieldValidator<String> validator;
+  final Function(String val) onSubmit;
 
   ITextField(
       {Key key,
       this.enabled = true,
       this.focusNode,
       ITextInputType keyboardType: ITextInputType.text,
+      this.textInputAction = TextInputAction.done,
       this.maxLines = 1,
       this.maxLength,
       this.text,
@@ -62,7 +65,8 @@ class ITextField extends StatefulWidget {
       this.inputBorder,
       this.prefixIcon,
       this.textStyle,
-      this.validator})
+      this.validator,
+      this.onSubmit})
       : assert(maxLines == null || maxLines > 0),
         assert(maxLength == null || maxLength > 0),
         keyboardType = maxLines == 1 ? keyboardType : ITextInputType.multiline,
@@ -78,6 +82,7 @@ class ITextFieldState extends State<ITextField> {
   bool _isNumber = false;
   bool _isPassword = false;
   bool showPwd = true;
+  FocusNode _focusNode;
 
   ///输入类型
   TextInputType _getTextInputType() {
@@ -121,6 +126,7 @@ class ITextFieldState extends State<ITextField> {
   void initState() {
     super.initState();
     mControll3 = TextEditingController(text: widget.text ?? '');
+    _focusNode = widget.focusNode ?? FocusNode();
   }
 
   ///输入范围
@@ -141,26 +147,41 @@ class ITextFieldState extends State<ITextField> {
   @override
   Widget build(BuildContext context) {
     TextField textField = new TextField(
-      focusNode: widget.focusNode ?? FocusNode(),
+      focusNode: _focusNode,
       enabled: widget.enabled,
       controller: mControll3,
       toolbarOptions:
           ToolbarOptions(copy: true, cut: true, paste: true, selectAll: true),
-      decoration: InputDecoration(
-          // labelText: mControll3.text.length > 0 ? mControll3.text : null,
-          hintStyle: widget.hintStyle,
-          counterStyle: TextStyle(color: Colors.white),
-          hintText: widget.hintText,
-          border: widget.inputBorder != null
-              ? widget.inputBorder
-              : UnderlineInputBorder(),
-          fillColor: Colors.transparent,
-          filled: true,
-          prefixIcon: widget.prefixIcon,
-          focusColor: Colors.white.withOpacity(0.5),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue),
-          )),
+      decoration: mControll3.text.length > 0
+          ? InputDecoration(
+              labelText: mControll3.text.length > 0 ? mControll3.text : null,
+              hintStyle: widget.hintStyle,
+              counterStyle: TextStyle(color: Colors.white),
+              hintText: widget.hintText,
+              border: widget.inputBorder != null
+                  ? widget.inputBorder
+                  : UnderlineInputBorder(),
+              fillColor: Colors.transparent,
+              filled: true,
+              prefixIcon: widget.prefixIcon,
+              focusColor: Colors.white.withOpacity(0.5),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue),
+              ))
+          : InputDecoration(
+              hintStyle: widget.hintStyle,
+              counterStyle: TextStyle(color: Colors.white),
+              hintText: widget.hintText,
+              border: widget.inputBorder != null
+                  ? widget.inputBorder
+                  : UnderlineInputBorder(),
+              fillColor: Colors.transparent,
+              filled: true,
+              prefixIcon: widget.prefixIcon,
+              focusColor: Colors.white.withOpacity(0.5),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue),
+              )),
       onChanged: (str) {
         setState(() {
           _inputText = str;
@@ -176,6 +197,14 @@ class ITextFieldState extends State<ITextField> {
       inputFormatters: _getTextInputFormatter(),
       style: widget.textStyle,
       obscureText: _isPassword,
+      textInputAction: widget.textInputAction,
+      onSubmitted: (String val) {
+        if (widget.onSubmit != null) {
+          widget.onSubmit(val);
+        } else {
+          _focusNode.canRequestFocus;
+        }
+      },
     );
 
     List<Widget> floorChilden() {
@@ -277,6 +306,7 @@ class IButtonTextField extends StatefulWidget {
   final bool enabled;
   final FocusNode focusNode;
   final ITextInputType keyboardType;
+  final TextInputAction textInputAction;
   final int maxLines;
   final int maxLength;
   final String text;
@@ -288,15 +318,23 @@ class IButtonTextField extends StatefulWidget {
   final double rightIconsSpace;
   final Widget otherWidget;
   final InputBorder inputBorder;
+  final InputBorder focusedBorder;
+  final InputBorder errorBorder;
+  final InputBorder focusedErrorBorder;
+  final Color fillColor;
+  final Color focusColor;
+  final Color hoverColor;
   final Widget prefixIcon;
   final TextStyle textStyle;
   final FormFieldValidator<String> validator;
+  final Function(String val) onSubmit;
 
   IButtonTextField(
       {Key key,
       this.enabled = true,
       this.focusNode,
       ITextInputType keyboardType: ITextInputType.text,
+      this.textInputAction = TextInputAction.done,
       this.maxLines = 1,
       this.maxLength,
       this.text = '',
@@ -308,9 +346,16 @@ class IButtonTextField extends StatefulWidget {
       this.rightIconsSpace = 4,
       this.otherWidget,
       this.inputBorder,
+      this.focusedBorder,
+      this.focusedErrorBorder,
+      this.errorBorder,
+      this.fillColor,
+      this.focusColor,
+      this.hoverColor,
       this.prefixIcon,
       this.textStyle,
-      this.validator})
+      this.validator,
+      this.onSubmit})
       : assert(maxLines == null || maxLines > 0),
         assert(maxLength == null || maxLength > 0),
         keyboardType = maxLines == 1 ? keyboardType : ITextInputType.multiline,
@@ -325,6 +370,7 @@ class _IButtonTextFieldState extends State<IButtonTextField> {
   bool _isNumber = false;
   bool _isPassword = false;
   bool showPwd = true;
+  FocusNode _focusNode;
 
   ///输入类型
   TextInputType _getTextInputType() {
@@ -366,7 +412,8 @@ class _IButtonTextFieldState extends State<IButtonTextField> {
   @override
   void initState() {
     super.initState();
-    mControll3 = TextEditingController(text: widget.text);
+    mControll3 = TextEditingController(text: widget.text ?? "");
+    _focusNode = widget.focusNode ?? FocusNode();
   }
 
   ///输入范围
@@ -387,44 +434,71 @@ class _IButtonTextFieldState extends State<IButtonTextField> {
   @override
   Widget build(BuildContext context) {
     TextField textField = new TextField(
-      focusNode: widget.focusNode ?? FocusNode(),
-      enabled: widget.enabled,
-      controller: mControll3,
-      toolbarOptions:
-          ToolbarOptions(copy: true, cut: true, paste: true, selectAll: true),
-      decoration: InputDecoration(
-        // labelText: mControll3.text.length > 0 ? mControll3.text : null,
-        hintStyle: widget.hintStyle,
-        counterStyle: TextStyle(color: Colors.white),
-        hintText: widget.hintText,
-        border: widget.inputBorder != null
-            ? widget.inputBorder
-            : UnderlineInputBorder(),
-        fillColor: Colors.transparent,
-        filled: true,
-        prefixIcon: widget.prefixIcon,
-        focusColor: Colors.white.withOpacity(0.5),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-      ),
-      onChanged: (str) {
-        _inputText = str;
-        _hasdeleteIcon = _inputText.isNotEmpty;
-        if (widget.fieldCallBack != null) {
-          widget.fieldCallBack(_inputText);
-        }
-        setState(
-          () {},
-        );
-      },
-      keyboardType: _getTextInputType(),
-      maxLength: widget.maxLength,
-      maxLines: widget.maxLines,
-      inputFormatters: _getTextInputFormatter(),
-      style: widget.textStyle,
-      obscureText: _isPassword,
-    );
+        focusNode: _focusNode,
+        enabled: widget.enabled,
+        controller: mControll3,
+        toolbarOptions:
+            ToolbarOptions(copy: true, cut: true, paste: true, selectAll: true),
+        decoration: mControll3.text.length > 0
+            ? InputDecoration(
+                labelText: mControll3.text,
+                hintStyle: widget.hintStyle,
+                counterStyle: TextStyle(color: Colors.white),
+                hintText: widget.hintText,
+                border: widget.inputBorder != null
+                    ? widget.inputBorder
+                    : UnderlineInputBorder(),
+                fillColor: Colors.transparent,
+                filled: true,
+                prefixIcon: widget.prefixIcon,
+                focusColor: Colors.white.withOpacity(0.5),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue),
+                ),
+              )
+            : InputDecoration(
+                hintStyle: widget.hintStyle,
+                counterStyle: TextStyle(color: Colors.white),
+                hintText: widget.hintText,
+                border: widget.inputBorder != null
+                    ? widget.inputBorder
+                    : UnderlineInputBorder(),
+                fillColor: Colors.transparent,
+                filled: true,
+                prefixIcon: widget.prefixIcon,
+                focusColor: widget.focusColor ?? Colors.white.withOpacity(0.5),
+                hoverColor: widget.fillColor ?? Colors.white,
+                focusedBorder: widget.focusedBorder ??
+                    UnderlineInputBorder(
+                      borderSide: BorderSide(color: widget.focusColor),
+                    ),
+                focusedErrorBorder: widget.focusedErrorBorder ?? null,
+                errorBorder: widget.errorBorder ?? null),
+        onChanged: (str) {
+          _inputText = str;
+          _hasdeleteIcon = _inputText.isNotEmpty;
+          if (widget.fieldCallBack != null) {
+            widget.fieldCallBack(_inputText);
+          }
+          setState(
+            () {},
+          );
+        },
+        keyboardType: _getTextInputType(),
+        maxLength: widget.maxLength,
+        maxLines: widget.maxLines,
+        inputFormatters: _getTextInputFormatter(),
+        style: widget.textStyle,
+        obscureText: _isPassword,
+        textInputAction: widget.textInputAction,
+        onSubmitted: (String val) {
+          if (widget.onSubmit != null) {
+            widget.onSubmit(val);
+          } else {
+            // _focusNode.requestFocus(FocusNode());
+            _focusNode.canRequestFocus;
+          }
+        });
     return Container(
       // width: double.maxFinite,
       // alignment: AlignmentDirectional.centerEnd,
